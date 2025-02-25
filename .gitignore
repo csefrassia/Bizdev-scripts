@@ -1,0 +1,5 @@
+.venv
+.venv/*
+*.csv
+*.xlsx
+gpt4.ipynb
