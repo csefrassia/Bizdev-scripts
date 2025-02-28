@@ -122,12 +122,17 @@ def main(input_csv_path, output_excel_path):
 
     grouped_df = df_expanded.groupby(["DOC TYPE", "ORDINE #", "LOTTO"]).agg(
         totale_quantità=("Somma di QTY PRODOTTO", "sum"),
-        prezzo_medio=("prezzo_unitario", "mean")
+        totale_prezzo_originale=("Somma di PREZZO ORIGINALE", "sum"),
+        totale_fatturato=("Somma di FATTURATO", "sum"),
+        totale_fatturato_eur=("Somma di FATTURATO EUR", "sum"),
+        totale_prezzo_eur_ivato=("Somma di PREZZO EUR IVATO", "sum"),
+        totale_sconto_eur_ivato=("Somma di SCONTO EUR IVATO", "sum"),
+        totale_imponibile_ivato=("Somma di IMPONIBILE EUR", "sum")
     ).reset_index()
 
 
      # Salva il risultato in un nuovo file Excel
-    grouped_df.to_excel(output_excel_path, index=False, engine='openpyxl')
+    grouped_df.to_excel(f"group_{output_excel_path}", index=False, engine='openpyxl')
 
     print(f"✅ Elaborazione completata. File salvato in: {output_excel_path}")
 
