@@ -116,7 +116,18 @@ def main(input_csv_path, output_excel_path):
     df_expanded["Somma di QTY PRODOTTO"] = df_expanded["Somma di QTY PRODOTTO"].apply(lambda x: 1 if x > 0 else -1)
 
     # Salva il risultato in un nuovo file Excel
-    df_expanded.to_excel(output_excel_path, index=False, engine='openpyxl')
+    # df_expanded.to_excel(output_excel_path, index=False, engine='openpyxl')
+
+    print(f"✅ Elaborazione completata. File salvato in: {output_excel_path}")
+
+    grouped_df = df_expanded.groupby(["DOC TYPE", "ORDINE #", "LOTTO"]).agg(
+        totale_quantità=("Somma di QTY PRODOTTO", "sum"),
+        prezzo_medio=("prezzo_unitario", "mean")
+    ).reset_index()
+
+
+     # Salva il risultato in un nuovo file Excel
+    grouped_df.to_excel(output_excel_path, index=False, engine='openpyxl')
 
     print(f"✅ Elaborazione completata. File salvato in: {output_excel_path}")
 
