@@ -120,19 +120,43 @@ def main(input_csv_path, output_excel_path):
 
     print(f"✅ Elaborazione completata. File salvato in: {output_excel_path}")
 
-    grouped_df = df_expanded.groupby(["DOC TYPE", "ORDINE #", "LOTTO"]).agg(
-        totale_quantità=("Somma di QTY PRODOTTO", "sum"),
-        totale_prezzo_originale=("Somma di PREZZO ORIGINALE", "sum"),
-        totale_fatturato=("Somma di FATTURATO", "sum"),
-        totale_fatturato_eur=("Somma di FATTURATO EUR", "sum"),
-        totale_prezzo_eur_ivato=("Somma di PREZZO EUR IVATO", "sum"),
-        totale_sconto_eur_ivato=("Somma di SCONTO EUR IVATO", "sum"),
-        totale_imponibile_ivato=("Somma di IMPONIBILE EUR", "sum")
-    ).reset_index()
+    # grouped_df = df_expanded.groupby(["DOC TYPE", "ORDINE #", "LOTTO"]).agg(
+    #     totale_quantità=("Somma di QTY PRODOTTO", "sum"),
+    #     totale_prezzo_originale=("Somma di PREZZO ORIGINALE", "sum"),
+    #     totale_fatturato=("Somma di FATTURATO", "sum"),
+    #     totale_fatturato_eur=("Somma di FATTURATO EUR", "sum"),
+    #     totale_prezzo_eur_ivato=("Somma di PREZZO EUR IVATO", "sum"),
+    #     totale_sconto_eur_ivato=("Somma di SCONTO EUR IVATO", "sum"),
+    #     totale_imponibile_ivato=("Somma di IMPONIBILE EUR", "sum")
+    # ).reset_index()
 
+    # Definire le colonne da raggruppare
+    group_columns = ["DOC TYPE", "ORDINE #", "LOTTO"]
 
-     # Salva il risultato in un nuovo file Excel
-    grouped_df.to_excel(f"group_{output_excel_path}", index=False, engine='openpyxl')
+    # Definire le colonne da aggregare con somma
+    sum_columns = [
+        "Somma di QTY PRODOTTO", 
+        "Somma di PREZZO ORIGINALE", 
+        "Somma di FATTURATO",
+        "Somma di FATTURATO EUR", 
+        "Somma di PREZZO EUR IVATO",
+        "Somma di SCONTO EUR IVATO", 
+        "Somma di IMPONIBILE EUR"
+    ]
+
+    # Creare il dizionario di aggregazione
+    agg_dict = {col: "sum" for col in sum_columns}
+
+    # Aggiungere le altre colonne con una funzione di aggregazione (es. 'first' per mantenere il primo valore del gruppo)
+    other_columns = [col for col in df_expanded.columns if col not in group_columns + sum_columns]
+    for col in other_columns:
+        agg_dict[col] = "first"  # Puoi cambiare 'first' con 'max', 'min' ecc. a seconda delle necessità
+
+    # Applicare il groupby con aggregazione
+    grouped_df = df_expanded.groupby(group_columns, as_index=False).agg(agg_dict)
+
+    # Salva il risultato in un nuovo file Excel
+    grouped_df.to_excel(f"group_2_{output_excel_path}", index=False, engine='openpyxl')
 
     print(f"✅ Elaborazione completata. File salvato in: {output_excel_path}")
 
