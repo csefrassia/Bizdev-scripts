@@ -156,7 +156,7 @@ def main(input_csv_path, output_excel_path):
     grouped_df = df_expanded.groupby(group_columns, as_index=False).agg(agg_dict)
 
     # Salva il risultato in un nuovo file Excel
-    grouped_df.to_excel(f"group_2_{output_excel_path}", index=False, engine='openpyxl')
+    grouped_df.to_excel(f"group_{output_excel_path}", index=False, engine='openpyxl')
 
     print(f"✅ Elaborazione completata. File salvato in: {output_excel_path}")
 
