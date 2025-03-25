@@ -153,12 +153,28 @@ def main(input_csv_path, output_excel_path):
         agg_dict[col] = "first"  # Puoi cambiare 'first' con 'max', 'min' ecc. a seconda delle necessità
 
     # Applicare il groupby con aggregazione
-    grouped_df = df_expanded.groupby(group_columns, as_index=False).agg(agg_dict)
+    # grouped_df = df_expanded.groupby(group_columns, as_index=False).agg(agg_dict)
+    # Salva il risultato in un nuovo file Excel
+    # grouped_df.to_excel(f"group_{output_excel_path}", index=False, engine='openpyxl')
+
+    # print(f"✅ Elaborazione completata. File salvato in: {output_excel_path}")
+
+    # Separiamo i due gruppi
+    df_to_group = df_expanded[df_expanded["Somma di IMPONIBILE EUR"] > 0]
+    df_to_keep = df_expanded[df_expanded["Somma di IMPONIBILE EUR"] == 0]
+
+    # Raggruppiamo solo le righe con IMPONIBILE > 0
+    grouped_df = df_to_group.groupby(group_columns, as_index=False).agg(agg_dict)
+
+    # Uniamo di nuovo i due dataset
+    final_df = pd.concat([grouped_df, df_to_keep], ignore_index=True)
 
     # Salva il risultato in un nuovo file Excel
-    grouped_df.to_excel(f"group_{output_excel_path}", index=False, engine='openpyxl')
+    final_df.to_excel(f"group_{output_excel_path}", index=False, engine='openpyxl')
 
-    print(f"✅ Elaborazione completata. File salvato in: {output_excel_path}")
+    print(f"✅ Elaborazione completata. File salvato in: group_{output_excel_path}")
+
+    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Processa un file CSV e salva il risultato in un file Excel.")
