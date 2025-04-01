@@ -145,12 +145,12 @@ def main(input_csv_path, output_excel_path):
     ]
 
     # Creare il dizionario di aggregazione
-    agg_dict = {col: "sum" for col in sum_columns}
+    # agg_dict = {col: "sum" for col in sum_columns}
 
-    # Aggiungere le altre colonne con una funzione di aggregazione (es. 'first' per mantenere il primo valore del gruppo)
-    other_columns = [col for col in df_expanded.columns if col not in group_columns + sum_columns]
-    for col in other_columns:
-        agg_dict[col] = "first"  # Puoi cambiare 'first' con 'max', 'min' ecc. a seconda delle necessità
+    # # Aggiungere le altre colonne con una funzione di aggregazione (es. 'first' per mantenere il primo valore del gruppo)
+    # other_columns = [col for col in df_expanded.columns if col not in group_columns + sum_columns]
+    # for col in other_columns:
+    #     agg_dict[col] = "first"  # Puoi cambiare 'first' con 'max', 'min' ecc. a seconda delle necessità
 
     # Applicare il groupby con aggregazione
     # grouped_df = df_expanded.groupby(group_columns, as_index=False).agg(agg_dict)
@@ -160,13 +160,39 @@ def main(input_csv_path, output_excel_path):
     # print(f"✅ Elaborazione completata. File salvato in: {output_excel_path}")
 
     # Separiamo i due gruppi
-    df_to_group = df_expanded[df_expanded["Somma di IMPONIBILE EUR"] > 0]
+    # df_to_group = df_expanded[df_expanded["Somma di IMPONIBILE EUR"] > 0]
+    # df_to_keep = df_expanded[df_expanded["Somma di IMPONIBILE EUR"] == 0]
+
+    # # Raggruppiamo solo le righe con IMPONIBILE > 0
+    # grouped_df = df_to_group.groupby(group_columns, as_index=False).agg(agg_dict)
+
+    # # Uniamo di nuovo i due dataset
+    # final_df = pd.concat([grouped_df, df_to_keep], ignore_index=True)
+
+    # # Salva il risultato in un nuovo file Excel
+    # final_df.to_excel(f"group_{output_excel_path}", index=False, engine='openpyxl')
+
+    # print(f"✅ Elaborazione completata. File salvato in: group_{output_excel_path}")
+
+    # Separiamo chiaramente i due dataset:
+    # - uno con imponibile diverso da 0 da raggruppare
+    # - uno con imponibile uguale a 0 da mantenere separato
+
+    df_to_group = df_expanded[df_expanded["Somma di IMPONIBILE EUR"] != 0]
     df_to_keep = df_expanded[df_expanded["Somma di IMPONIBILE EUR"] == 0]
 
-    # Raggruppiamo solo le righe con IMPONIBILE > 0
+    # Raggruppiamo solo le righe con imponibile diverso da 0
+    agg_dict = {col: "sum" for col in sum_columns}
+    other_columns = [col for col in df_expanded.columns if col not in group_columns + sum_columns]
+
+    for col in other_columns:
+        agg_dict[col] = "first"
+
     grouped_df = df_to_group.groupby(group_columns, as_index=False).agg(agg_dict)
 
-    # Uniamo di nuovo i due dataset
+    # Non applichiamo alcun raggruppamento alle righe con imponibile 0 (restano come sono)
+
+    # Uniamo i due dataset correttamente
     final_df = pd.concat([grouped_df, df_to_keep], ignore_index=True)
 
     # Salva il risultato in un nuovo file Excel
